@@ -106,46 +106,87 @@ class _BodyState extends State<Body> {
           });
         },
         child: Container(
-          decoration: BoxDecoration(
-              color: Colors.black,
-              border: Border.all(color: Colors.white, width: 6),
-              borderRadius: BorderRadius.circular(6),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black38,
-                    offset: Offset(12 * y.sign, 12 * y.sign),
-                    blurRadius: 12)
-              ]),
+          decoration: BoxDecoration(color: Colors.black, boxShadow: [
+            BoxShadow(
+                color: Colors.black38,
+                offset: Offset(12 * y.sign, 12 * y.sign),
+                blurRadius: 12)
+          ]),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
-                  chooseColor(0);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Image.asset(
-                    "assets/images/circles_red_little.png",
-                    fit: BoxFit.fitWidth,
-                    color: currentTriangleRedColor,
+              Expanded(
+                child: GestureDetector(
+                  onTap:(){
+                    chooseColor(2);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border(
+                          // top: BorderSide(color: Colors.black, width: 6),
+                          top:
+                              BorderSide(width: 6.0, color: currentShapeRedColor),
+                          left:
+                              BorderSide(width: 6.0, color: currentShapeRedColor),
+                          right:
+                              BorderSide(width: 6.0, color: currentShapeRedColor),
+                        ),
+                        // borderRadius: BorderRadius.circular(6),
+                        color: Colors.black),
+                    child: GestureDetector(
+                      onTap: () {
+                        chooseColor(0);
+                      },
+                      child: Padding(
+                        padding:   EdgeInsets.only(left : 44.0,right:44.0,top:10.0,bottom: 54),
+                        child : Image.asset(
+                            "assets/images/circles_red_little.png",
+                            fit: BoxFit.fitWidth,
+                            color: currentTriangleRedColor,
+                          ),
+
+                      ),
+                    ),
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  chooseColor(1);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Image.asset(
-                    "assets/images/circles_blue_little.png",
-                    fit: BoxFit.fitWidth,
-                    color: currentTriangleBlueColor,
+              Expanded(
+                child: GestureDetector(
+                  onTap:(){
+                    chooseColor(3);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border(
+                          // top: BorderSide(color: Colors.black, width: 6),
+                          bottom:
+                              BorderSide(width: 6.0, color: currentShapeBlueColor),
+                          left:
+                              BorderSide(width: 6.0, color: currentShapeBlueColor),
+                          right:
+                              BorderSide(width: 6.0, color: currentShapeBlueColor),
+                        ),
+                        color: Colors.black),
+                    child: GestureDetector(
+                      onTap: () {
+                        chooseColor(1);
+                      },
+                      child: Padding(
+                        padding:   EdgeInsets.only(left : 44.0,right:44.0,bottom:10.0,top: 54),
+                        child : Image.asset(
+                            "assets/images/circles_blue_little.png",
+                            fit: BoxFit.contain,
+                            color: currentTriangleBlueColor,
+                          ),
+
+                      ),
+                    ),
                   ),
                 ),
-              )
-            ],
+              ),
+               ],
           ),
         ),
       ),
