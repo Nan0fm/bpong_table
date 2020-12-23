@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class Body extends StatefulWidget {
@@ -9,8 +10,13 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  Color currentBlueColor = Colors.blue;
-  Color currentRedColor = Colors.red;
+  static const platform = const MethodChannel('io.foxmount.bpong/udp');
+
+  Color currentTriangleBlueColor = Colors.blue;
+  Color currentShapeBlueColor = Colors.blue;
+  Color currentTriangleRedColor = Colors.red;
+  Color currentShapeRedColor = Colors.red;
+  String ipAddress = "192.168.31.249";
 
   double x = -48;
   double y = 0;
@@ -63,12 +69,16 @@ class _BodyState extends State<Body> {
                     },
                     child: Text("Vertical"))),
             Container(
-                width: halfWidth,
-                child: FlatButton(
-                    onPressed: () {
-                      // rotateTable()
-                    },
-                    child: Text("Perspective"))),
+              width: halfWidth,
+              child: Container(
+                color: Colors.black12,
+                child: TextField(
+                  onChanged: (text) {
+                    ipAddress = text;
+                  },
+                ),
+              ),
+            ),
           ],
         )
       ],
@@ -111,27 +121,27 @@ class _BodyState extends State<Body> {
             children: [
               GestureDetector(
                 onTap: () {
-                  chooseColor(false);
+                  chooseColor(0);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Image.asset(
                     "assets/images/circles_red_little.png",
                     fit: BoxFit.fitWidth,
-                    color: currentRedColor,
+                    color: currentTriangleRedColor,
                   ),
                 ),
               ),
               GestureDetector(
                 onTap: () {
-                  chooseColor(true);
+                  chooseColor(1);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Image.asset(
                     "assets/images/circles_blue_little.png",
                     fit: BoxFit.fitWidth,
-                    color: currentBlueColor,
+                    color: currentTriangleBlueColor,
                   ),
                 ),
               )
@@ -168,7 +178,24 @@ class _BodyState extends State<Body> {
     });
   }
 
-  void chooseColor(bool isBlue) {
+  Future<void> _senUdpColor(
+      int partOfColors, Color currentColor, String ip) async {
+    String wifiListString;
+    try {
+      final String result = await platform.invokeMethod('sendUdpColor', {
+        'ip': ip,
+        'partOfColors': partOfColors,
+        'red': currentColor.red,
+        'green': currentColor.green,
+        'blue': currentColor.blue
+      });
+      wifiListString = 'Result: ' + result;
+    } on PlatformException catch (e) {
+      wifiListString = "Failed to get battery level: '${e.message}'.";
+    }
+  }
+
+  void chooseColor(int partOfColor) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -180,11 +207,20 @@ class _BodyState extends State<Body> {
           ),
           content: SingleChildScrollView(
             child: SlidePicker(
-              pickerColor: isBlue ? currentBlueColor : currentRedColor,
+              pickerColor: checkColor(partOfColor),
               onColorChanged: (color) {
                 setState(() {
-                  isBlue ? currentBlueColor = color : currentRedColor = color;
+                  if (partOfColor == 0) {
+                    currentTriangleRedColor = color;
+                  } else if (partOfColor == 1) {
+                    currentTriangleBlueColor = color;
+                  } else if (partOfColor == 2) {
+                    currentShapeRedColor = color;
+                  } else {
+                    currentShapeBlueColor = color;
+                  }
                 });
+                _senUdpColor(partOfColor, color, ipAddress);
               },
               paletteType: PaletteType.rgb,
               enableAlpha: false,
@@ -199,5 +235,17 @@ class _BodyState extends State<Body> {
         );
       },
     );
+  }
+
+  Color checkColor(int partOfColor) {
+    if (partOfColor == 0) {
+      return currentTriangleRedColor;
+    } else if (partOfColor == 1) {
+      return currentTriangleBlueColor;
+    } else if (partOfColor == 2) {
+      return currentShapeRedColor;
+    } else {
+      return currentShapeBlueColor;
+    }
   }
 }
